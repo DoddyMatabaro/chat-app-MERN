@@ -1,8 +1,8 @@
 const express = require('express');
 
-const router = express.router();
+const router = express.Router();
 
-router.ge('/login', function(req, res, next)=>{
+router.get('/login', (req, res, next)=>{
     res.render('login');
 });
 
