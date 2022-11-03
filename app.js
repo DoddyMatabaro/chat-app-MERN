@@ -1,5 +1,5 @@
 const  express = require('express');
-const mongoConnect = require('./util/database');
+const {mongoConnect, getDB} = require('./util/database');
 require('dotenv').config()
 
 const app = express();
@@ -13,8 +13,7 @@ const authRoutes = require('./routes/auth');
 
 app.use('/', authRoutes);
 
-mongoConnect(client =>{
-    console.log(client)
+mongoConnect(() =>{
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
     });

@@ -2,20 +2,30 @@ const mongodb=require('mongodb');
 const MongoClient = mongodb.MongoClient;
 require('dotenv').config()
 
+let _db;
+
 const password = process.env.PASS_DB;
 const user = process.env.USER_DB;
 const urlDB = `mongodb+srv://${user}:${password}@atlascluster.zeaqo3p.mongodb.net/?retryWrites=true&w=majority`;
 
-const mongoConnect = callback=>{
+exports.mongoConnect = (callback)=>{
     MongoClient.connect(urlDB)
     .then(client=>{
         console.log("Connected to Mongo");
-        callback(client);
+        _db = client.db();
+        callback();
     })
     .catch((error)=>{
-        console.log(error)
+        console.log(error);
     });
 };
 
-module.exports = mongoConnect;
+exports.getDB = () =>{
+    if(_db){
+        return _db;
+    }
+    throw "no database found";
+}
+
+
 
