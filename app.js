@@ -1,11 +1,21 @@
 const  express = require('express');
+const mongoConnect = require('./util/database');
+require('dotenv').config()
 
 const app = express();
 
 const PORT = process.env.PORT || 9000;
 
-express.use(express.json());
+app.use(express.json());
 
-const server = app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-  });
+
+const authRoutes = require('./routes/auth');
+
+app.use('/', authRoutes);
+
+mongoConnect(client =>{
+    console.log(client)
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+});

@@ -1,8 +1,14 @@
 const express = require('express');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const router = express.Router();
+const crypto = require('crypto');
+// const db  = require('../db');
 
-const router = express.router();
-
-router.ge('/login', function(req, res, next)=>{
+passport.use(new LocalStrategy((usename, password, cb)=>{
+    db.get
+}))
+router.get('/login', (req, res, next)=>{
     res.render('login');
 });
 
