@@ -1,4 +1,4 @@
-const getDB =  require('../util/database').getDB;
+const getDb =  require('../util/database').getDB;
 class User{
     constructor(username,password){
         this.username = username;
@@ -6,6 +6,15 @@ class User{
     }
 
     save(){
-
+        const db = getDb();
+        db.collection('products')
+        .insertOne(this)
+        .then(result=>{
+            console.log(result)
+        })
+        .catch(err=>{
+            console.error(err)
+        });
+        
     }
 }
