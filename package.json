@@ -16,6 +16,7 @@
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^2.0.3",
+    "connect-sqlite3": "^0.9.13",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.3",
     "express": "^4.16.3",
@@ -23,6 +24,8 @@
     "express-session": "^1.15.6",
     "mongodb": "^3.7.3",
     "mongoose": "^5.2.17",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0"
