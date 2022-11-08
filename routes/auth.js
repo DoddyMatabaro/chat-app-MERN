@@ -3,7 +3,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const router = express.Router();
 const crypto = require('crypto');
-const db = require('../config/db.config');
+const trDb = require('../config/db.config');
 
 passport.use(new LocalStrategy(function verify(username, password, cb) {
     db.get('SELECT * FROM users WHERE username = ?', [ username ], function(err, row) {
@@ -32,9 +32,9 @@ passport.serializeUser(function(user, cb) {
     });
   });
   
-passport.use(new LocalStrategy((usename, password, cb)=>{
-    db.get
-}))
+// passport.use(new LocalStrategy((usename, password, cb)=>{
+//     db.get
+// }))
 router.get('/login', (req, res, next)=>{
     res.render('login');
 });
@@ -59,21 +59,24 @@ router.post('/logout', function(req, res, next) {
     var salt = crypto.randomBytes(16);
     crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
       if (err) { return next(err); }
-      db.run('INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)', [
-        req.body.username,
-        hashedPassword,
-        salt
-      ], function(err) {
-        if (err) { return next(err); }
-        var user = {
-          id: this.lastID,
-          username: req.body.username
-        };
-        req.login(user, function(err) {
-          if (err) { return next(err); }
-          res.redirect('/');
-        });
-      });
+
+      trDb.set((err, db)=>{
+            db.query('INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)', [
+                req.body.username,
+                hashedPassword,
+                salt
+            ], (err, result)=> {
+                if (err) { return next(err); }
+                const user = {
+                id: result.insertId,
+                username: req.body.username
+                };
+                req.login(user, function(err) {
+                if (err) { return next(err); }
+                res.redirect('/');
+                });
+            });
+    });//trDB fin
     });
   });
   

@@ -9,15 +9,14 @@ const session = require('express-session');
 const mysql      = require('mysql');
 // const {mongoConnect, getDB} = require('./util/database');
 require('dotenv').config()
-
-const userRoutes = require('./routes/user');
-const authRoutes = require('./routes/auth');
-const indexRoutes = require('./routes/index');
-
 const SQLiteStore = require('connect-sqlite3')(session);
 const password = process.env.PASS_DB;
 const user = process.env.USER_DB;
 const PORT = process.env.PORT || 9000;
+
+const userRoutes = require('./routes/user');
+const authRoutes = require('./routes/auth');
+const indexRoutes = require('./routes/index');
 
 const app = express();
 
@@ -30,13 +29,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.user('/', )
-app.use('/', authRoutes);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+app.use(passport.initialize());
 
 app.use(session({
   secret: 'keyboard cat',
@@ -46,6 +39,11 @@ app.use(session({
   store: new SQLiteStore({ db: 'sessions.db', dir: './util'})
 }));
 app.use(passport.authenticate('session'));
+app.use('/', indexRoutes);
+app.use('/', authRoutes);
+app.use(function(req, res, next) {
+  next(createError(404));
+});
 
 app.listen(PORT);
 

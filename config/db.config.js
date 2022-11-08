@@ -1,9 +1,12 @@
 
 const mysql= require('mysql');
 const transaction =  require('node-mysql-transaction');
-var mkdirp = require('mkdirp');
-var crypto = require('crypto');
+const mkdirp = require('mkdirp');
+const crypto = require('crypto');
 
+mkdirp.sync('./var/db');
+
+let dbCon;
 
 const trCon = transaction({
   connection : [mysql.createConnection,{
@@ -47,11 +50,13 @@ trCon.set((err, db)=>{
     ], (err, result)=>{
       if(err) db.rollback()
   });
+  dbCon = db;
   if(err) throw err;
     console.log(err);
 });
 
 module.exports = trCon;
+
 
 // connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
 //   if (err) throw err;
