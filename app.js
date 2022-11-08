@@ -12,6 +12,7 @@ require('dotenv').config()
 
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
+const indexRoutes = require('./routes/index');
 
 const SQLiteStore = require('connect-sqlite3')(session);
 const password = process.env.PASS_DB;
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '/public')));
 
+app.user('/', )
 app.use('/', authRoutes);
 
 // catch 404 and forward to error handler

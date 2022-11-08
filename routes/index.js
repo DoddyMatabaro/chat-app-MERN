@@ -11,3 +11,5 @@ router.get('/', (req, res, next)=>{
     res.locals.filter = null;
     res.render('index', { user: req.user });
   });
+
+  module.exports = router;
