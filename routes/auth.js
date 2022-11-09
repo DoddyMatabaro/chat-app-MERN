@@ -1,42 +1,14 @@
 const express = require('express');
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
 const router = express.Router();
-const crypto = require('crypto');
-const trDb = require('../config/db.config');
+const User = require('../models/user');
 
-passport.use(new LocalStrategy(function verify(username, password, cb) {
-    trDb.set((err, db)=>{
-        db.query('SELECT * FROM users WHERE username = ?', [ username ], (err, row)=> {
-            if (err) { return cb(err); }
-            if (!row) { return cb(null, false, { message: 'Incorrect username or password.' }); }
-        
-                crypto.pbkdf2(password, row.salt, 310000, 32, 'sha256', (err, hashedPassword)=> {
-                if (err) { return cb(err); }
-                if (!crypto.timingSafeEqual(row.hashed_password, hashedPassword)) {
-                     return cb(null, false, { message: 'Incorrect username or password.' });
-                }
-                return cb(null, row);
-            });
-        }); 
-    })
-}));
+const LocalStrategy = require('passport-local').Strategy;
+passport.use(new LocalStrategy(User.authenticate()));
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-passport.serializeUser(function(user, cb) {
-    process.nextTick(function() {
-      cb(null, { id: user.id, username: user.username });
-    });
-  });
-  
-  passport.deserializeUser(function(user, cb) {
-    process.nextTick(function() {
-      return cb(null, user);
-    });
-  });
-  
-// passport.use(new LocalStrategy((usename, password, cb)=>{
-//     db.get
-// }))
 router.get('/login', (req, res, next)=>{
     res.render('login');
 });
@@ -57,29 +29,64 @@ router.post('/logout', function(req, res, next) {
     res.render('signup');
   })
 
-  router.post('/signup', function(req, res, next) {
-    var salt = crypto.randomBytes(16);
-    crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
-      if (err) { return next(err); }
-
-      trDb.set((err, db)=>{
-            db.query('INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)', [
-                req.body.username,
-                hashedPassword,
-                salt
-            ], (err, result)=> {
-                if (err) { return next(err); }
-                const user = {
-                id: result.insertId,
-                username: req.body.username
-                };
-                req.login(user, function(err) {
-                if (err) { return next(err); }
-                res.redirect('/');
-                });
+  router.post('/signup', (req, res) =>{
+            User.register(new User({username: req.body.username}), req.body.password,(err, user)=>{
+                if(err){
+                    res.json({success: false, message: "Your account could not be saved. Error: "+err})
+                }else{
+                    req.login(user, (er)=> {
+                        if (er) {
+                            res.json({ success: false, message: er });
+                        }
+                        else {
+                            res.json({ success: true, message: "Your account has been saved" });
+                        }
+                    })
+                }
             });
-    });//trDB fin
-    });
+            // db.query('INSERT INTO users(username, hashed_password, salt) VALUES (?, ?, ?)', [
+            //     req.body.username,
+            //     hashedPassword,
+            //     salt
+            // ], (err, result)=> {
+            //     if (err) { 
+            //         console.log(err)
+            //         return next(err); 
+            //     }
+            //     const user = {
+            //     id: result.insertId,
+            //     username: req.body.username
+            //     };
+            //     req.login(user, function(err) {
+            //     if (err) { return next(err); }
+            //     res.redirect('/');
+            //     });
+            // });
   });
+
+  router.post("/login", function (req, res) {
+    if (!req.body.username) {
+        res.json({ success: false, message: "Username was not given" })
+    }
+    else if (!req.body.password) {
+        res.json({ success: false, message: "Password was not given" })
+    }
+    else {
+        passport.authenticate("local", function (err, user, info) {
+            if (err) {
+                res.json({ success: false, message: err });
+            }
+            else {
+                if (!user) {
+                    res.json({ success: false, message: "username or password incorrect" });
+                }
+                else {
+                    const token = jwt.sign({ userId: user._id, username: user.username }, secretkey, { expiresIn: "24h" });
+                    res.json({ success: true, message: "Authentication successful", token: token });
+                }
+            }
+        })(req, res);
+    }
+});
   
 module.exports = router;
