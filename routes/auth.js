@@ -13,10 +13,10 @@ router.get('/login', (req, res, next)=>{
     res.render('login');
 });
 
-router.post('/login/password', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-}));
+// router.post('/login/password', passport.authenticate('local', {
+//     successRedirect: '/',
+//     failureRedirect: '/login'
+// }));
 
 router.post('/logout', function(req, res, next) {
     req.logout(function(err) {
@@ -64,7 +64,7 @@ router.post('/logout', function(req, res, next) {
             // });
   });
 
-  router.post("/login", function (req, res) {
+  router.post("/login/password",  (req, res)=> {
     if (!req.body.username) {
         res.json({ success: false, message: "Username was not given" })
     }
@@ -74,15 +74,15 @@ router.post('/logout', function(req, res, next) {
     else {
         passport.authenticate("local", function (err, user, info) {
             if (err) {
-                res.json({ success: false, message: err });
+                res.json({ success: false, message: "err"+err });
             }
             else {
                 if (!user) {
                     res.json({ success: false, message: "username or password incorrect" });
                 }
                 else {
-                    const token = jwt.sign({ userId: user._id, username: user.username }, secretkey, { expiresIn: "24h" });
-                    res.json({ success: true, message: "Authentication successful", token: token });
+                    // const token = jwt.sign({ userId: user._id, username: user.username }, secretkey, { expiresIn: "24h" });
+                    res.json({ success: true, message: "Authentication successful"});
                 }
             }
         })(req, res);
