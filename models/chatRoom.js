@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
   
-const ChatRoom = new Schema({   
+const ChatRoomSchema = new Schema({   
     name: {
         type: String, 
         required:"Name is required", 
@@ -10,4 +10,4 @@ const ChatRoom = new Schema({
 
   
 // export userschema
-module.exports = mongoose.model("Chatroom", ChatRoom)
+module.exports = mongoose.model("Chatroom", ChatRoomSchema)

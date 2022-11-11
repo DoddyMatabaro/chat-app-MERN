@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
-const LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(User.authenticate()));
+// const LocalStrategy = require('passport-local').Strategy;
+// passport.use(new LocalStrategy(User.authenticate()));
 passport.use(User.createStrategy());
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -20,6 +21,7 @@ class UserController{
             res.json({ success: false, message: "Password was not given" })
         }
         else {
+            try{
             passport.authenticate("local", function (err, user, info) {
                 if (err) {
                     res.json({ success: false, message: "err"+err });
@@ -29,11 +31,17 @@ class UserController{
                         res.json({ success: false, message: "username or password incorrect" });
                     }
                     else {
-                        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.secretToken, { expiresIn: "24h" });
+                        // const token = jwt.sign({ userId: user._id, username: user.username }, process.env.secretToken, { expiresIn: "24h" });
                         res.json({ success: true, message: "Authentication successful"});
                     }
                 }
             });
+        }catch(e){
+            console.log(e)
+            res.statut(401).json({
+                message: "error :"+e,
+            })
+        }
         }
     };
 
