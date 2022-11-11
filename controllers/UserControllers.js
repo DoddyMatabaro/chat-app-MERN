@@ -3,6 +3,8 @@ const passport = require('passport');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
+require('dotenv').config();
+
 const LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(User.authenticate()));
 passport.use(User.createStrategy());
@@ -27,7 +29,7 @@ class UserController{
                         res.json({ success: false, message: "username or password incorrect" });
                     }
                     else {
-                        const token = jwt.sign({ userId: user._id, username: user.username }, secretkey, { expiresIn: "24h" });
+                        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.secretToken, { expiresIn: "24h" });
                         res.json({ success: true, message: "Authentication successful"});
                     }
                 }
