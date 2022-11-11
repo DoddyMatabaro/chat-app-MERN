@@ -10,8 +10,11 @@ const UserSchema = new Schema({
         required: "Profile picture is required",
         default: 'xyz'
     },
-    timestamps: true,
-});
+    },
+    {
+        timestamps: true,
+    }
+);
   
 // plugin for passport-local-mongoose
 UserSchema.plugin(passportLocalMongoose);

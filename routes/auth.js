@@ -1,8 +1,17 @@
-const express = require('express');
-const router = express.Router();
-const UserController = require('../controllers/UserControllers');
+const jwt = require('jsonwebtoken');
 
-  router.post('/signup', UserController.signupUser);
-  router.post("/login", UserController.loginUser);
-  
-module.exports = router;
+module.exports =  (req, res, next)=>{
+    try{
+        if(!req.headers.authorization) throw "Forbidden!!!";
+
+        const token = req.headers.authorization.split(" ")[1];
+
+        const playload = jwt.verify(token, process.env.secretToken);
+        req.playload = playload;
+        next();
+    }catch(err){
+        res.statut(401).json({
+            message: "Forbidden !!!",
+        })
+    }
+}

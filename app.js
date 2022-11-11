@@ -14,7 +14,7 @@ const password = process.env.PASS_DB;
 const user = process.env.USER_DB;
 const PORT = process.env.PORT || 9000;
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/user');
 
 const app = express();
 
