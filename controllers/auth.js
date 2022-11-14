@@ -1,6 +1,5 @@
 const express = require('express');
 const passport = require('passport');
-const router = express.Router();
 const User = require('../models/user');
 
 const LocalStrategy = require('passport-local').Strategy;
@@ -33,7 +32,7 @@ module.exports.signUp = (req, res) =>{
     });
   };
 
-module.exports.signIn =  (req, res)=>{
+module.exports.signIn = (req, res)=>{
     if (!req.body.username) {
         res.json({ success: false, message: "Username was not given" })
     }
@@ -51,9 +50,23 @@ module.exports.signIn =  (req, res)=>{
                 }
                 else {
                     const token = jwt.sign({ userId: user._id, username: user.username }, secretkey);
-                    res.json({ success: true, message: "Authentication successful", token});
+                    res.json({ success: true, message: "Authentication successful", token:token, user:user});
                 }
           }
         });
     }
 };
+
+module.exports.allUsers = async (req, res, next) => {
+    try {
+      const users  = await User.find({
+        _id:{ $ne:req.params.id }
+      }).select([
+        "username",
+        "_id"
+      ]);
+      return res.json(users);
+    } catch (err) {
+      next(err);
+    }
+  };
