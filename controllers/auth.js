@@ -1,6 +1,8 @@
 const express = require('express');
 const passport = require('passport');
+const jwt  = require('jsonwebtoken');
 const User = require('../models/user');
+require('dotenv').config()
 
 const LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(User.authenticate()));
@@ -49,11 +51,11 @@ module.exports.signIn = (req, res)=>{
                     res.json({ success: false, message: "username or password incorrect" });
                 }
                 else {
-                    const token = jwt.sign({ userId: user._id, username: user.username }, secretkey);
-                    res.json({ success: true, message: "Authentication successful", token:token, user:user});
+                    const token = jwt.sign({ userId: user._id, username: user.username }, process.env.secretKey);
+                    res.json({ success: true, message: "Authentication successful",token, user:user});
                 }
           }
-        });
+        })(req, res);
     }
 };
 
@@ -65,8 +67,8 @@ module.exports.allUsers = async (req, res, next) => {
         "username",
         "_id"
       ]);
-      return res.json(users);
+      return res.json({users: users, message: "Success"});
     } catch (err) {
-      next(err);
+      return res.json({message: err});
     }
   };

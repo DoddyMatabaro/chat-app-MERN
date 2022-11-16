@@ -1,9 +1,9 @@
-const message = require("../models/message");
+const Messsage = require("../models/message");
 
 module.exports.addMessage = async (req, res, next) => {
     try {
         const {from,to,message} = req.body;
-        const data = await messageModel.create({
+        const data = await Messsage.create({
             message:{
                 text: message
             },
@@ -15,12 +15,11 @@ module.exports.addMessage = async (req, res, next) => {
         });
 
         if(data) return res.json({
-            msg: "Success!"
+            message: "Success!"
         });
         return res.json({ 
-            msg: "Failed"
+            message: "Failed"
         });
-
     } catch (err) {
         next(err);
     }
@@ -43,6 +42,6 @@ module.exports.allMessages = async (req, res, next) => {
         });
         res.json(projectMessages);
     } catch (error) {
-        next(error);
+        res.json({message: error});
     }
 };
