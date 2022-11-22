@@ -72,3 +72,17 @@ module.exports.allUsers = async (req, res, next) => {
       return res.json({message: err});
     }
   };
+
+
+  module.exports.user = async (req, res, next) => {
+    try {
+      const user  = await User.findOne({
+        _id:{ $ne:req.params.id }
+      }).select([
+        "username"
+      ]);
+      return res.json({user: user, message: "Success"});
+    } catch (err) {
+      return res.json({message: err.message});
+    }
+  };

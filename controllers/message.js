@@ -5,7 +5,7 @@ module.exports.addMessage = async (req, res, next) => {
         const {from,to,message} = req.body;
         const data = await Messsage.create({
             message:{
-                text: message
+                text: message,
             },
             users: [
                 from,
@@ -32,7 +32,7 @@ module.exports.converse = async (req, res, next) => {
             users:{
                 $all: [from,to],
             },
-        }).sort({ updatedAt: 1 });
+        }).sort({ updatedAt: 1 }).populate('Users');
 
         const projectMessages = messages.map((msg)=>{
             return{
@@ -40,19 +40,17 @@ module.exports.converse = async (req, res, next) => {
                 message: msg.message.text,
             };
         });
-        res.json(projectMessages);
+        res.json( messages);
     } catch (error) {
-        res.json({message: error});
+        res.json({message: error.message});
     }
 };
+
 module.exports.allMessages = async (req, res, next) => {
      try {
         const messages  = await Messsage.find({
-          send:{ $ne:req.params.id }
-        }).select([
-          "username",
-          "sender"
-        ]);
+            _id:{ $ne:req.params.id }}
+        ).populate('Users');
         return res.json(messages);
       } catch (err) {
         return res.json({message: err});
