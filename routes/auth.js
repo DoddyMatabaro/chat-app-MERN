@@ -1,15 +1,12 @@
-const express = require('express');
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const express = require('express')
 const router = express.Router();
-const crypto = require('crypto');
-// const db  = require('../db');
+const {signOut, signUp, signIn, allUsers, user} = require("../controllers/auth");
 
-passport.use(new LocalStrategy((usename, password, cb)=>{
-    db.get
-}))
-router.get('/login', (req, res, next)=>{
-    res.render('login');
-});
+  router.get('/signout', signOut);
+  router.post('/signup', signUp);
+  router.post("/signin",  signIn);
 
+  router.get("/users/:id",  allUsers);
+  router.get("/user/:id",  user);
+  
 module.exports = router;

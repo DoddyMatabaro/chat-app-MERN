@@ -1,20 +1,51 @@
 const  express = require('express');
-const {mongoConnect, getDB} = require('./util/database');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+const mongoose = require('mongoose');
+const logger = require('morgan');
+const path = require('path');
+const passport = require('passport');
+const session = require('express-session');
+const bodyParser = require('body-parser')
+
 require('dotenv').config()
 
-const app = express();
-
+const password = process.env.PASS_DB;
+const user = process.env.USER_DB;
 const PORT = process.env.PORT || 9000;
 
+const userRoutes = require('./routes/user');
+const authRoutes = require('./routes/auth');
+const messageRoutes = require('./routes/message');
+
+app.use(logger('dev'));
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.json());
 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}))
+app.use(passport.initialize());
+app.use(passport.authenticate('session'));
 
-const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+app.use('/api/message', messageRoutes);
 
-app.use('/', authRoutes);
+mongoose
+.connect(`mongodb+srv://${user}:${password}@atlascluster.zeaqo3p.mongodb.net/?retryWrites=true&w=majority`, 
+  {useNewUrlParser:true,
+  useUnifiedTopology:true})
+.then(result =>{
+  console.log("connexion reussie");
+})
+.catch(err=>{
+  console.error(err)
+});
 
-mongoConnect(() =>{
-    app.listen(PORT, () => {
-        console.log(`Server listening on port ${PORT}`);
-    });
+const server = app.listen(PORT, ()=>{
+  console.log(`Server started on Port ${PORT}`);
 });
