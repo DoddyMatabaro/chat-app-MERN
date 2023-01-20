@@ -1,14 +1,25 @@
 const  express = require('express');
 const cors = require('cors');
+const http = require('http');
 const app = express();
 app.use(cors());
+const server = http.createServer(app);
 const mongoose = require('mongoose');
 const logger = require('morgan');
 const path = require('path');
+
+app.use('/public', express.static('public'));
+
 const passport = require('passport');
 const session = require('express-session');
-const bodyParser = require('body-parser')
-
+const bodyParser = require('body-parser');
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
+});
+const Message = require('./models/message');
 require('dotenv').config()
 
 const password = process.env.PASS_DB;
@@ -46,6 +57,35 @@ mongoose
   console.error(err)
 });
 
-const server = app.listen(PORT, ()=>{
+io.on('connection', (socket)=>{
+  console.log("user  connected");
+
+  socket.on('send', (data)=>{
+        const res = new Message({
+          message:{
+              text: data.text,
+          },
+          users: [
+              data.from,
+              data.to
+            ],
+            sender:data.from,
+        });
+
+        res.save().then(resp=>{
+          const newMessage = {
+                fromSelf: data.from === resp.sender.toString(),
+                message: resp.message.text,
+          } 
+          io.emit('sendToAll', newMessage);
+        }).catch((e)=>{
+          console.log(e.message);
+        });
+    socket.emit('connection', null);
+  })
+})
+
+server.listen(PORT, ()=>{
   console.log(`Server started on Port ${PORT}`);
 });
+

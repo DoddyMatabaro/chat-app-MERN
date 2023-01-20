@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {signOut, signUp, signIn, allUsers, user} = require("../controllers/auth");
+const {signOut, signUp, signIn, allUsers, user, upload} = require("../controllers/auth");
 
   router.get('/signout', signOut);
   router.post('/signup', signUp);

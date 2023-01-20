@@ -1,6 +1,8 @@
+// const { json } = require("body-parser");
 const Messsage = require("../models/message");
 
 module.exports.addMessage = async (req, res, next) => {
+    const {from,to,message} = req.body;
     try {
         const {from,to,message} = req.body;
         const data = await Messsage.create({
@@ -14,15 +16,14 @@ module.exports.addMessage = async (req, res, next) => {
             sender:from,
         });
 
-        if(data) return res.json({
-            message: "Success!"
-        });
-        return res.json({ 
-            message: "Failed"
-        });
+        if(data) return res.json({ message: "Success!" });
+        
+        return res.json({  message: "Failed"  });
+
     } catch (err) {
-        next(err);
+        res.json(err.message);
     }
+
 };
 
 module.exports.converse = async (req, res, next) => {
@@ -40,7 +41,7 @@ module.exports.converse = async (req, res, next) => {
                 message: msg.message.text,
             };
         });
-        res.json( messages);
+        res.json(projectMessages);
     } catch (error) {
         res.json({message: error.message});
     }

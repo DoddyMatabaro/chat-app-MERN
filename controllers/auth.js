@@ -2,7 +2,13 @@ const express = require('express');
 const passport = require('passport');
 const jwt  = require('jsonwebtoken');
 const User = require('../models/user');
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+
 require('dotenv').config()
+const DIR = './public/';
+
+
 
 const LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(User.authenticate()));
@@ -18,15 +24,15 @@ module.exports.signOut = (req, res, next) => {
 };
 
 module.exports.signUp = (req, res) =>{
-    User.register(new User({username: req.body.username}), req.body.password,(err, user)=>{
+  User.register(new User(
+    {username: req.body.username}), req.body.password,(err, user)=>{
         if(err){
             res.json({success: false, message: "Your account could not be saved. Error: "+err})
         }else{
             req.login(user, (er)=> {
                 if (er) {
                     res.json({ success: false, message: er });
-                }
-                else {
+                }else {
                     res.json({ success: true, message: "Your account has been saved" });
                 }
             })
