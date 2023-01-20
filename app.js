@@ -46,44 +46,44 @@ app.use(passport.authenticate('session'));
 app.use('/api/auth', authRoutes);
 app.use('/api/message', messageRoutes);
 
-mongoose
-.connect(`mongodb+srv://${user}:${password}@atlascluster.zeaqo3p.mongodb.net/?retryWrites=true&w=majority`, 
-  {useNewUrlParser:true,
-  useUnifiedTopology:true})
-.then(result =>{
-  console.log("connexion reussie");
-})
-.catch(err=>{
-  console.error(err)
-});
+// mongoose
+// .connect(`mongodb+srv://${user}:${password}@atlascluster.zeaqo3p.mongodb.net/?retryWrites=true&w=majority`, 
+//   {useNewUrlParser:true,
+//   useUnifiedTopology:true})
+// .then(result =>{
+//   console.log("connexion reussie");
+// })
+// .catch(err=>{
+//   console.error(err)
+// });
 
-io.on('connection', (socket)=>{
-  console.log("user  connected");
+// io.on('connection', (socket)=>{
+//   console.log("user  connected");
 
-  socket.on('send', (data)=>{
-        const res = new Message({
-          message:{
-              text: data.text,
-          },
-          users: [
-              data.from,
-              data.to
-            ],
-            sender:data.from,
-        });
+//   socket.on('send', (data)=>{
+//         const res = new Message({
+//           message:{
+//               text: data.text,
+//           },
+//           users: [
+//               data.from,
+//               data.to
+//             ],
+//             sender:data.from,
+//         });
 
-        res.save().then(resp=>{
-          const newMessage = {
-                fromSelf: data.from === resp.sender.toString(),
-                message: resp.message.text,
-          } 
-          io.emit('sendToAll', newMessage);
-        }).catch((e)=>{
-          console.log(e.message);
-        });
-    socket.emit('connection', null);
-  })
-})
+//         res.save().then(resp=>{
+//           const newMessage = {
+//                 fromSelf: data.from === resp.sender.toString(),
+//                 message: resp.message.text,
+//           } 
+//           io.emit('sendToAll', newMessage);
+//         }).catch((e)=>{
+//           console.log(e.message);
+//         });
+//     socket.emit('connection', null);
+//   })
+// })
 
 server.listen(PORT, ()=>{
   console.log(`Server started on Port ${PORT}`);
